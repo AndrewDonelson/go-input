@@ -3,6 +3,7 @@ package goinput
 import (
 	"github.com/AndrewDonelson/go-input/keyboard"
 	"github.com/AndrewDonelson/go-input/mouse"
+	"github.com/AndrewDonelson/go-input/questions"
 )
 
 // Polling represents the update speed for detecting input.
@@ -18,7 +19,7 @@ const (
 	Game                  // 60x/sec
 )
 
-// InputState holds all current input states
+// InputState holds the current state of the keyboard and mouse input.
 type InputState struct {
 	Keyboard keyboard.State
 	Mouse    mouse.State
@@ -27,14 +28,25 @@ type InputState struct {
 var (
 	// DefaultKeyboard allows immediate access to default keyboard input
 	DefaultKeyboard = NewKeyboard()
+
 	// Defaultmouse allows immediate access to default mouse input
 	DefaultMouse = NewMouse()
+
+	// Default Ask
+	DefaultAsk = questions.Ask{
+		Keyboard: DefaultKeyboard,
+		Mouse:    DefaultMouse,
+	}
 )
 
+// NewKeyboard returns a new keyboard watcher that can be used to monitor keyboard input.
+// The returned watcher is configured with the default polling mode of Eco.
 func NewKeyboard() *keyboard.Watcher {
 	return keyboard.NewWatcher()
 }
 
+// NewMouse returns a new mouse watcher that can be used to monitor mouse input.
+// The returned watcher is configured with the default polling mode of Eco.
 func NewMouse() *mouse.Watcher {
 	return mouse.NewWatcher()
 }
