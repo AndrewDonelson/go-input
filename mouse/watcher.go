@@ -1,6 +1,9 @@
-// Copyright 2014 The Azul3D Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// file: mouse/watcher.go
+// description: Implementation of the mouse watcher, which monitors mouse input.
+//
+// Copyright 2025 Andrew Donelson. All rights reserved.
+// Use of this source code is governed by the license that can be
+// found in the LICENSE file.
 
 package mouse
 
@@ -56,11 +59,11 @@ func (w *Watcher) SetState(button Button, state State) {
 // by this watcher. The indices of the lookup table are literally Button
 // values:
 //
-//  states := watcher.States()
-//  leftState := states[mouse.Left]
-//  if leftState != InvalidState {
-//      fmt.Println("The left mouse button state is", leftState)
-//  }
+//	states := watcher.States()
+//	leftState := states[mouse.Left]
+//	if leftState != InvalidState {
+//	    fmt.Println("The left mouse button state is", leftState)
+//	}
 //
 // States for buttons not known to the watcher are equal to InvalidState.
 //
@@ -84,7 +87,8 @@ func (w *Watcher) EachState(f func(b Button, s State) bool) {
 
 	for b, state := range w.states {
 		button := Button(b)
-		if button == Invalid {
+		// Skip the Invalid button and buttons with InvalidState
+		if button == Invalid || state == InvalidState {
 			continue
 		}
 
@@ -102,21 +106,18 @@ func (w *Watcher) EachState(f func(b Button, s State) bool) {
 
 // State returns the current state of the specified mouse button.
 func (w *Watcher) State(button Button) State {
-	w.access.Lock()
-	defer w.access.Unlock()
+	w.access.RLock()
+	defer w.access.RUnlock()
 
 	// If the lookup table isn't large enough to contain the button's state, we
 	// are not aware of it so it's in the Up state.
 	b := int(button)
-	if b > len(w.states) {
+	if b >= len(w.states) {
 		return Up
 	}
 
-	state := w.states[b]
-	if state != InvalidState {
-		return state
-	}
-	return Up
+	// Return the actual state, including InvalidState if that's what's set
+	return w.states[b]
 }
 
 // Down tells whether the specified mouse button is currently in the down
@@ -127,7 +128,9 @@ func (w *Watcher) Down(button Button) bool {
 
 // Up tells whether the specified mouse button is currently in the up state.
 func (w *Watcher) Up(button Button) bool {
-	return w.State(button) == Up
+	state := w.State(button)
+	// InvalidState is treated as Up for the purpose of this method
+	return state == Up || state == InvalidState
 }
 
 // NewWatcher returns a new, initialized, mouse watcher.

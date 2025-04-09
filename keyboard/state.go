@@ -1,3 +1,6 @@
+// file: state.go
+// description: This file contains the definition of the keyboard state constants and the State type.
+//
 // Copyright 2014 The Azul3D Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.

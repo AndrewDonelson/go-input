@@ -1,4 +1,7 @@
-package main
+// file: userinput/userinput.go
+// description: Package for handling user input from the console with various types
+
+package userinput
 
 import (
 	"bufio"
@@ -9,16 +12,17 @@ import (
 	"strings"
 )
 
+// UserInput provides methods for reading user input from the console
 type UserInput struct {
 	reader    *bufio.Reader
 	falseAlts []string
 	trueAlts  []string
 }
 
-// NewUserInput creates a new UserInput instance with a bufio.Reader
+// New creates a new UserInput instance with a bufio.Reader
 // for reading user input, and pre-defined lists of false and true
 // alternative input values.
-func NewUserInput() *UserInput {
+func New() *UserInput {
 	return &UserInput{
 		reader:    bufio.NewReader(os.Stdin),
 		falseAlts: []string{"n", "no", "f", "false", "0"},
@@ -41,38 +45,31 @@ func (ui *UserInput) ReadString(prompt string) (string, error) {
 // ReadInt reads an integer value from the user, prompting with the given string.
 // It returns the integer value read, or an error if the input could not be parsed.
 func (ui *UserInput) ReadInt(prompt string, args ...int) (int, error) {
-
-	var min, max, val int
+	min := math.MinInt32
+	max := math.MaxInt32
 
 	switch len(args) {
-	case 2:
+	case 1:
 		// Only one value provided, treat it as max
 		max = args[0]
-	case 3:
+	case 2:
 		// Both min and max provided
 		min = args[0]
 		max = args[1]
-	default:
-		// No min and max provided, use default values
-		min = math.MinInt32
-		max = math.MaxInt32
 	}
 
-	// Loop until we get a valid integer value
-	for {
-		input, _ := ui.ReadString(prompt)
+	input, err := ui.ReadString(prompt)
+	if err != nil {
+		return 0, err
+	}
 
-		val, err := strconv.Atoi(input)
-		if err != nil {
-			fmt.Printf("Invalid input, please enter an integer value between %d and %d\n", min, max)
-			continue
-		}
-		if val < min || val > max {
-			fmt.Printf("Invalid input, please enter an integer value between %d and %d\n", min, max)
-			continue
-		}
+	val, err := strconv.Atoi(input)
+	if err != nil {
+		return 0, fmt.Errorf("invalid integer: %w", err)
+	}
 
-		break
+	if val < min || val > max {
+		return 0, fmt.Errorf("value %d is outside allowed range [%d, %d]", val, min, max)
 	}
 
 	return val, nil
@@ -85,7 +82,13 @@ func (ui *UserInput) ReadFloat(prompt string) (float64, error) {
 	if err != nil {
 		return 0, err
 	}
-	return strconv.ParseFloat(input, 64)
+
+	val, err := strconv.ParseFloat(input, 64)
+	if err != nil {
+		return 0, fmt.Errorf("invalid floating point number: %w", err)
+	}
+
+	return val, nil
 }
 
 // ReadBool reads a boolean value from the user input. It accepts a variety of common
@@ -109,37 +112,6 @@ func (ui *UserInput) ReadBool(prompt string) (bool, error) {
 			return true, nil
 		}
 	}
-	return false, fmt.Errorf("invalid input: %v", input)
-}
-
-func main() {
-	ui := NewUserInput()
-
-	name, err := ui.ReadString("Enter your name: ")
-	if err != nil {
-		fmt.Println("Error reading name:", err)
-		return
-	}
-	fmt.Println("Hello,", name)
-
-	age, err := ui.ReadInt("Enter your age: ")
-	if err != nil {
-		fmt.Println("Error reading age:", err)
-		return
-	}
-	fmt.Println("Your age is:", age)
-
-	height, err := ui.ReadFloat("Enter your height (in meters): ")
-	if err != nil {
-		fmt.Println("Error reading height:", err)
-		return
-	}
-	fmt.Println("Your height is:", height, "meters")
-
-	isStudent, err := ui.ReadBool("Are you a student? (true/false): ")
-	if err != nil {
-		fmt.Println("Error reading student status:", err)
-		return
-	}
-	fmt.Println("Student status:", isStudent)
+	return false, fmt.Errorf("invalid boolean input: %v (expected one of: %v or %v)",
+		input, strings.Join(ui.trueAlts, ", "), strings.Join(ui.falseAlts, ", "))
 }

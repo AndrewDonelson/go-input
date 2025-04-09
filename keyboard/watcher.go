@@ -1,6 +1,9 @@
-// Copyright 2014 The Azul3D Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// file: keyboard/watcher.go
+// description: Implementation of the keyboard watcher, which monitors keyboard input.
+//
+// Copyright 2025 Andrew Donelson. All rights reserved.
+// Use of this source code is governed by the license that can be
+// found in the LICENSE file.
 
 package keyboard
 
@@ -20,9 +23,12 @@ type Watcher struct {
 // String returns a multi-line string representation of this keyboard watcher
 // and it's associated states (but not raw ones).
 func (w *Watcher) String() string {
+	w.access.RLock()
+	defer w.access.RUnlock()
+
 	bb := new(bytes.Buffer)
 	fmt.Fprintf(bb, "keyboard.Watcher(\n")
-	for k, s := range w.States() {
+	for k, s := range w.states {
 		fmt.Fprintf(bb, "\t%v: %v,\n", k, s)
 	}
 	fmt.Fprintf(bb, ")")
@@ -71,12 +77,11 @@ func (w *Watcher) EachState(f func(k Key, s State) bool) {
 
 // State returns the current state of the specified key.
 func (w *Watcher) State(k Key) State {
-	w.access.Lock()
-	defer w.access.Unlock()
+	w.access.RLock()
+	defer w.access.RUnlock()
 
 	state, ok := w.states[k]
 	if !ok {
-		w.states[k] = Up
 		return Up
 	}
 	return state
@@ -115,12 +120,11 @@ func (w *Watcher) RawStates() map[uint64]State {
 
 // RawState returns the current state of the specified raw key value.
 func (w *Watcher) RawState(raw uint64) State {
-	w.access.Lock()
-	defer w.access.Unlock()
+	w.access.RLock()
+	defer w.access.RUnlock()
 
 	state, ok := w.rawStates[raw]
 	if !ok {
-		w.rawStates[raw] = Up
 		return Up
 	}
 	return state

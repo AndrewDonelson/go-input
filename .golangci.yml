@@ -1,0 +1,47 @@
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    - gosec
+    - gofmt
+    - revive
+    - misspell
+    - goimports
+    - bodyclose
+    - prealloc
+    - unconvert
+    - unparam
+    - whitespace
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  revive:
+    rules:
+      - name: exported
+        severity: warning
+        disabled: false
+  goimports:
+    local-prefixes: github.com/AndrewDonelson/go-input
+  gosec:
+    excludes:
+      - G104 # Ignored for testing files
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gosec
+
+run:
+  timeout: 5m
+  tests: true
+  skip-dirs:
+    - vendor/
+    - third_party/

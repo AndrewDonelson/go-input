@@ -1,13 +1,41 @@
-# Binaries for programs and plugins
+# Binaries and compiled files
+bin/
+dist/
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
+goinput-*
 
-# Test binary, build with `go test -c`
+# Test binary, built with `go test -c`
 *.test
 
-# Output of the go coverage tool, specifically when used with LiteIDE
+# Output of the go coverage tool
 *.out
-goinput-linux-amd64
+coverage.html
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Go specific
+go.work
+go.sum
+
+# Dependency directories
+vendor/
+
+# Debug files
+debug
+__debug_bin
+
+# Log files
+*.log
+
+# Environment files
+.env
+.env.local

@@ -1,3 +1,5 @@
+// file: global_test.go
+// description: This file contains the test cases for the global variables and functions in the package.
 package goinput
 
 import (

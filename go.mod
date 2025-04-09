@@ -1,3 +1,3 @@
 module github.com/AndrewDonelson/go-input
 
-go 1.22.0
+go 1.23.0

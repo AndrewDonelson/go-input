@@ -1,3 +1,6 @@
+// file: goinput.go
+// description: Main package file containing global variables and polling constants
+
 package goinput
 
 import (
@@ -10,9 +13,9 @@ import (
 type Polling uint8
 
 // Polling mode constants, Eco will check the input ten times per second.
-// Normal will check thirty times per seconds and Game will uodate at sixty
+// Normal will check thirty times per seconds and Game will update at sixty
 // times per second. Default is Eco which is suggested for standard console
-// or user input that does not require a high update interval
+// or user input that does not require a high update interval.
 const (
 	Eco    Polling = iota // 10x/sec
 	Normal                // 30x/sec
@@ -29,14 +32,11 @@ var (
 	// DefaultKeyboard allows immediate access to default keyboard input
 	DefaultKeyboard = NewKeyboard()
 
-	// Defaultmouse allows immediate access to default mouse input
+	// DefaultMouse allows immediate access to default mouse input
 	DefaultMouse = NewMouse()
 
-	// Default Ask
-	DefaultAsk = questions.Ask{
-		Keyboard: DefaultKeyboard,
-		Mouse:    DefaultMouse,
-	}
+	// DefaultAsk provides a default instance of the questions.Ask struct
+	DefaultAsk = questions.New(DefaultKeyboard, DefaultMouse)
 )
 
 // NewKeyboard returns a new keyboard watcher that can be used to monitor keyboard input.

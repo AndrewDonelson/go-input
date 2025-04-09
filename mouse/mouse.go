@@ -1,3 +1,6 @@
+// file: mouse.go
+// description: This file contains the definition of the mouse package, including the State and Button types and their constants.
+//
 // Copyright 2014 The Azul3D Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
